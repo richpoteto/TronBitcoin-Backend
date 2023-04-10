@@ -49,12 +49,12 @@ var io = socketIO(server, {
 });
 
 io.on('connection', (socket) => {
-  socket.join("fightRoom");
-  console.log('entered');
+  socket.join("BroadCast");
+  console.log('Connected');
 
-  socket.on('enter', () => {
+  socket.on('message', (message) => {
     console.log("broadcast to everyone");
-    socket.broadcast.to('fightRoom').emit('entered');
+    socket.broadcast.to('BroadCast').emit('messsage', message);
   })
 });
 

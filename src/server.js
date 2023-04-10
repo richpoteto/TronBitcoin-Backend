@@ -12,14 +12,15 @@ const config = require('./config');
 const APIError = require('./helpers/APIError');
 const app = require("express")();
 const http = require('http');
-const WebSocket = require('ws');
+// const WebSocket = require('ws');
+const socketIO = require('socket.io');
  if (config.env === 'development') {
   app.use(logger('dev'));
 }
  // parse body params and attache them to req.body
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
- app.use(cookieParser());
+app.use(cookieParser());
 app.use(compress());
 app.use(methodOverride());
  // secure apps by setting various HTTP headers
@@ -53,19 +54,28 @@ app.use((err, req, res, next) => // eslint-disable-line no-unused-vars
     message: err.isPublic ? err.message : httpStatus[err.status],
     stack: config.env === 'development' ? err.stack : {},
 }));
- const server = http.createServer(app);
- // WebSocket configuration
 
-const wss = new WebSocket.Server({ server });
- wss.on('connection', (ws) => {
-  console.log('Client connected');
-   ws.on('message', (message) => {
-    console.log(`Received message: ${message}`);
-     wss.clients.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(message);
-      }
-    });
-  });
+const server = http.createServer(app);
+// WebSocket configuration
+
+// const wss = new WebSocket.Server({ server, path : '/socket' });
+//  wss.on('connection', (ws) => {
+//   console.log('Client connected');
+//    ws.on('message', (message) => {
+//     console.log(`Received message: ${message}`);
+//      wss.clients.forEach((client) => {
+//       if (client.readyState === WebSocket.OPEN) {
+//         client.send(message);
+//       }
+//     });
+//   });
+// });
+var io = socketIO(server, {
+  cors: {
+    origins: '*:*'
+  }
 });
- module.exports = server;
+
+
+
+module.exports = server;
