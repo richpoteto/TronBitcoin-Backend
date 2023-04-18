@@ -49,13 +49,16 @@ var io = socketIO(server, {
 });
 
 io.on('connection', (socket) => {
-  socket.join("BroadCast");
-  console.log('Connected');
+  socket.join("TronCommunity");
+  console.log('entered');
 
   socket.on('message', (message) => {
-    console.log("broadcast to everyone");
-    socket.broadcast.to('BroadCast').emit('messsage', message);
-  })
+    console.log("broadcast to everyone", message);
+    socket.broadcast.to('TronCommunity').emit('News', message);
+  });
+  socket.on('disconnect', () => {
+    console.log('🔥: A user disconnected');
+  });
 });
 
 if (!module.parent) {
