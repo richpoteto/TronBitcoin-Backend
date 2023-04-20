@@ -8,4 +8,7 @@ const router = express.Router();
 router.route('/ids')
     .get(nftCtrl.findIds);
 
+router.route('/stake')
+    .post(nftCtrl.stakeNFT);
+
 module.exports = router;

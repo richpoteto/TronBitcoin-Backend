@@ -13,13 +13,16 @@ const alchemy = new Alchemy(config);
 
 async function findIds(req, res, next) {
     try {
+        // Get all NFTs
         const nfts = await alchemy.nft.getNftsForOwner(req.query.address);
+        // Print NFTs
         var len = nfts.ownedNfts.length;
+        console.log(nfts.ownedNfts[0]);
         var IDs = [];
         for (let i = 0; i < len; i++) {
-            console.log(nfts.ownedNfts[i].tokenId, 111);
-            IDs.push([nfts.ownedNfts[i].tokenId, nfts.ownedNfts[i].contract.address]);
+            IDs.push({id : nfts.ownedNfts[i].tokenId, address : nfts.ownedNfts[i].contract.address, baseURI : nfts.ownedNfts[i].tokenUri});
         }
+        console.log(IDs)
         return res.json(IDs);
     } catch (error) {
         next(error);
@@ -41,7 +44,17 @@ async function findUrls(req, res, next) {
     }
 }
 
+async function stakeNFT(req, res, next) {
+    const {collection, id} = req.query;
+    try {
+        
+    } catch (error) {
+      return next(error);
+    }
+  }
+
 module.exports = {
     findIds,
     findUrls,
+    stakeNFT
 };

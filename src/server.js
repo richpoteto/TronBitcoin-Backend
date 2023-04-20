@@ -12,26 +12,32 @@ const config = require('./config');
 const APIError = require('./helpers/APIError');
 const app = require("express")();
 const http = require('http');
-// const WebSocket = require('ws');
-const socketIO = require('socket.io');
- if (config.env === 'development') {
+
+if (config.env === 'development') {
   app.use(logger('dev'));
 }
- // parse body params and attache them to req.body
+
+// parse body params and attache them to req.body
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
 app.use(cookieParser());
 app.use(compress());
 app.use(methodOverride());
- // secure apps by setting various HTTP headers
+
+// secure apps by setting various HTTP headers
 app.use(helmet());
- // enable CORS - Cross Origin Resource Sharing
+
+// enable CORS - Cross Origin Resource Sharing
 app.use(cors());
- // mount all routes on /api path
+
+// mount all routes on /api path
 app.use('/api', routes);
- // if error is not an instanceOf APIError, convert it.
+
+// if error is not an instanceOf APIError, convert it.
 app.use((err, req, res, next) => {
   if (err instanceof ValidationError) {
+    // validation error contains details object which has error message attached to error property.
     const allErrors = err.details.map((pathErrors) => Object.values(pathErrors).join(', '));
     const unifiedErrorMessage = allErrors.join(', ').replace(/, ([^,]*)$/, ' and $1');
     const error = new APIError(unifiedErrorMessage, err.statusCode);
@@ -43,12 +49,14 @@ app.use((err, req, res, next) => {
   }
   return next(err);
 });
- // catch 404 and forward to error handler
+
+// catch 404 and forward to error handler
 app.use((req, res, next) => {
   const err = new APIError('API Not Found', httpStatus.NOT_FOUND);
   return next(err);
 });
- // error handler, send stacktrace only during development
+
+// error handler, send stacktrace only during development
 app.use((err, req, res, next) => // eslint-disable-line no-unused-vars
   res.status(err.status).json({ // eslint-disable-line implicit-arrow-linebreak
     message: err.isPublic ? err.message : httpStatus[err.status],
@@ -56,26 +64,5 @@ app.use((err, req, res, next) => // eslint-disable-line no-unused-vars
 }));
 
 const server = http.createServer(app);
-// WebSocket configuration
-
-// const wss = new WebSocket.Server({ server, path : '/socket' });
-//  wss.on('connection', (ws) => {
-//   console.log('Client connected');
-//    ws.on('message', (message) => {
-//     console.log(`Received message: ${message}`);
-//      wss.clients.forEach((client) => {
-//       if (client.readyState === WebSocket.OPEN) {
-//         client.send(message);
-//       }
-//     });
-//   });
-// });
-var io = socketIO(server, {
-  cors: {
-    origins: '*:*'
-  }
-});
-
-
 
 module.exports = server;
